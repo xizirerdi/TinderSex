@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: A simple scatterplot with value labels</title>
+		<script type="text/javascript" src="../d3.js"></script>
+		<style type="text/css">
+				
+		</style>
+	</head>
+	<body>
+
+            
+        <button class="button" onclick="startMatching()">Try</button>
+		<script type="text/javascript">
+            
+            /* initial set up */	
+			var w = 100;
+			var h = 100;
+            var padding = 10;
+
+            /* matching/swiping simulation */
+            var startMatching = function() {
+
+                   d3.select(".circles")
+                   .attr("class","swiped")
+                   .transition("swiping")
+                   .duration(500)
+                   .attr("cx", "-10");
+
+                  remainingMatches();
+               }
+            
+            /* matching/swiping simulation */
+            var remainingMatches = function() {
+                d3.selectAll(".circles")
+                    .transition("sortCircles")
+                    .duration(500)
+                    .delay(function(d,i){return i*10})
+                    .attr("cx", function(d, i) {
+			   		    return w/2;
+			         })
+			        .attr("cy", function(d,i) {
+                        return yScale(i)+40;
+			        });
+
+                d3.select(".selection")
+                    .transition("sortSelection")
+                    .duration(500)
+                    .delay(50)
+                    .attr("fill", "red")
+                    .attr("cx", w/2)
+                    .attr("cy", 10);
+            }
+
+            /* random population */
+			var dataset = [
+							[500, 500], [500, 505], [500, 510], [500, 515], 
+                            [505, 500], [505, 505], [505, 510], [505, 515], 
+                            [510, 500], [510, 505], [510, 510], [510, 515]
+						  ];
+
+            /* button initial state */
+            d3.select(".button").style("visibility", "hidden")
+
+            xScale = d3.scaleTime()
+						.domain([
+						    d3.min(dataset, function(d) {return d[0]}),  //startDate minus one day, for padding
+							d3.max(dataset, function(d) {return d[0]})	  //endDate plus one day, for padding
+								])
+						.range([padding, w - padding]);
+            
+            yScale = d3.scaleTime()
+						.domain([
+						    d3.min(dataset, function(d) {return d[1]}),  //startDate minus one day, for padding
+							d3.max(dataset, function(d) {return d[1]})	  //endDate plus one day, for padding
+								])
+						.range([padding, h - padding]);
+	
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+            
+           
+
+			svg.selectAll("circle")
+			   .data(dataset)
+			   .enter()
+			   .append("circle")
+               .attr("class", "circles")
+			   .attr("cx", function(d) {
+			   		return xScale(d[0]);
+			   })
+			   .attr("cy", function(d) {
+                    return yScale(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return 10;
+			   })
+               .attr("fill",function(d){
+                   return "black"
+               });
+
+            /* interaction, once a circle is selected, 
+            1.assigns one circles as a test user, 
+            2.changes the selected circle's class to selection,
+            3. assigns the rest
+            as the    */
+            d3.selectAll("circle")
+                .on("click", function() {
+                    d3.select(this)
+                        .attr("class","selection")
+                    h=500;
+                    w=100;
+                    d3.select("svg")
+                    .attr("width", w)
+                    .attr("height", h)
+                    
+                    yScale.domain([
+						    d3.min(dataset, function(d,i) {return i}),  //startDate minus one day, for padding
+							d3.max(dataset, function(d,i) {return i})	  //endDate plus one day, for padding
+								])
+                    yScale.range([padding, h - padding])
+
+                    svg.append("rect")
+			   
+			           
+
+               .attr("x", "30")
+               .attr("y", "30")
+
+               .attr("width", "40")
+               .attr("height", "40")
+               .attr("fill", "none")
+               .attr("stroke", "black")
+                    
+
+                    d3.select(".button").style("visibility", "visible")
+                    
+                    d3.selectAll(".circles")
+                    .transition("sortCircles")
+                    .duration(500)
+                    .delay(function(d,i){return i*10})
+                    .attr("cx", function(d, i) {
+			   		    return w/2;
+			         })
+			        .attr("cy", function(d,i) {
+                        return yScale(i)+40;
+			        })
+
+                    d3.select(".selection")
+                        .transition("sortSelection")
+                        .duration(500)
+                        .delay(50)
+                        .attr("fill", "red")
+                        .attr("cx", w/2)
+                        .attr("cy", 10)
+
+                    
+
+
+
+
+                    
+			   
+
+            
+                });
+			
+		</script>
+	</body>
+</html>
